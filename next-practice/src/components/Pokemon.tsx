@@ -30,7 +30,7 @@ const Pokemon: React.FC = () => {
   if (loading) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
-  return <div> 데이터 들어갈 곳! </div>;
+  return <div> 데이터 들어갈 곳!</div>;
 };
 
 export default Pokemon;
