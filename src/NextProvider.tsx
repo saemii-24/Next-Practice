@@ -7,7 +7,7 @@ interface Props {
 }
 
 export const client = new ApolloClient({
-  uri: "https://graphqlpokemon.favware.tech/v8",
+  uri: "https://graphql-pokeapi.graphcdn.app/",
   cache: new InMemoryCache(),
 });
 
