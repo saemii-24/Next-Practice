@@ -10,15 +10,15 @@ const Card = () => {
   );
 };
 
-const Ball = ({ width = 50, height = 50 }) => {
+const Ball = () => {
   return (
     <svg
       id="Layer_1"
       version="1.1"
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
-      width={width}
-      height={height}
+      width="200"
+      height="auto"
     >
       <style type="text/css"></style>
       <g>
