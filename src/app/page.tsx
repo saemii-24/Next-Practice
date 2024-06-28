@@ -1,9 +1,12 @@
-import Pokemon from "@/components/Pokemon";
+// import Pokemon from "@/components/Pokemon";
+
+import Card from "@/components/Card";
 
 export default function Home() {
   return (
     <div>
-      <Pokemon />
+      {/* <Pokemon /> */}
+      <Card />
     </div>
   );
 }
