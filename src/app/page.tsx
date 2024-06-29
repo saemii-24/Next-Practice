@@ -8,9 +8,16 @@ export default function Home() {
   return (
     <>
       <Header text={header.root} />
-      <main>
-        {/* <Pokemon /> */}
-        <Card />
+      <main className="mt-20 flex justify-center items-center">
+        <div className="container grid grid-cols-3 gap-8">
+          <Card />
+          <Card />
+          <Card />
+          <Card />
+          <Card />
+          <Card />
+          <Card />
+        </div>
       </main>
     </>
   );

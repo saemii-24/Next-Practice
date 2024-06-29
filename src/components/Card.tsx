@@ -9,7 +9,7 @@ const Card = () => {
   };
 
   return (
-    <div className="w-[320px] h-[150px] p-5 shadow-[0_0_20px_0_rgba(250,204,21,0.5),0_0_20px_0_rgba(236,72,153,0.5)] rounded-lg">
+    <div className="w-[320px] h-[150px] p-5 shadow-[0_0_10px_0_rgba(250,204,21,0.3),0_0_10px_0_rgba(236,72,153,0.3)] rounded-lg">
       <div className="w-full">
         <div className="flex justify-between">
           <div className="flex items-center text-xs">
@@ -29,7 +29,7 @@ const Card = () => {
           >
             전기
           </button>
-          <div className="mt-4 text-xl">피카츄</div>
+          <div className="mt-4 text-xl font-bold">피카츄</div>
         </div>
         <div className="flex items-center justify-center">
           <Image
