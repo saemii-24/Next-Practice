@@ -44,7 +44,7 @@ const Card = () => {
   );
 };
 
-const Ball = () => {
+export const Ball = () => {
   return (
     <svg
       id="Layer_1"
@@ -76,7 +76,7 @@ const Ball = () => {
   );
 };
 
-const Star = ({
+export const Star = ({
   start = false,
   onClick,
 }: {
