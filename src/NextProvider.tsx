@@ -15,7 +15,7 @@ export const client = new ApolloClient({
 export const NextProvider = ({ children }: Props) => {
   return (
     <RecoilRoot>
-      <ApolloProvider client={client}>{children}</ApolloProvider>;
+      <ApolloProvider client={client}>{children}</ApolloProvider>
     </RecoilRoot>
   );
 };

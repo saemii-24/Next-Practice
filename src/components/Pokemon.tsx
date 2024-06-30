@@ -2,13 +2,14 @@ import Image from "next/image";
 import React from "react";
 import { Ball } from "./Card";
 
-const Pokemon = () => {
+const Pokemon = ({ num }: { num: number }) => {
+  console.log(num);
   return (
     <div className="py-8 flex flex-col items-center justify-center shadow-[0_0_10px_0_rgba(250,204,21,0.3),0_0_10px_0_rgba(236,72,153,0.3)] rounded-lg">
       <div className="w-full px-8 flex items-center text-xs">
         <Ball />
         <div className="ml-2">no.</div>
-        <div>001</div>
+        <div>00{num}</div>
       </div>
       <div>
         <Image
@@ -16,6 +17,7 @@ const Pokemon = () => {
           width={80}
           height={80}
           alt="Picture of the author"
+          priority
         />
       </div>
       <div>
