@@ -23,6 +23,7 @@ export default function Home() {
     console.log(pokemonRefs);
   }, []);
 
+  //데이터 배열
   let [arr, setArr] = useState<string[]>([
     "피카츄1",
     "라이츄2",
@@ -30,50 +31,51 @@ export default function Home() {
     "꼬북이4",
   ]);
 
+  //drag하는 item
   let [dragItem, setDragItem] = useState<HTMLDivElement | null>(null);
-  let [dropItem, setDropItem] = useState<HTMLDivElement | null>(null);
-  let [itemNum, setItemNum] = useState<number | null>(null);
-  const handleDrag = (e: any) => {
-    //어떤 아이템위로 드래그 되는가?
-    const targetItem = e.target;
-    console.log(targetItem);
-    console.log("현재 어떤 아이템 위로 드래그 시도중인가?: " + targetItem);
-    setDropItem(targetItem);
+
+  //drop하는 위치에 있는 item
+  let [destinationItem, setDestinationItem] = useState<HTMLDivElement | null>(
+    null
+  );
+
+  //어떤 아이템위로 드래그 되는가?
+  const dragDestination = (e: React.DragEvent<HTMLDivElement>) => {
+    const targetItem = e.target as HTMLDivElement;
+    setDestinationItem(targetItem);
   };
-  const nowDragItem = (e: any) => {
-    const targetItem = e.target;
-    // console.log(targetItem);
-    console.log("현재 드래그 중인 아이템: " + targetItem);
+
+  //현재 드래그 하는 아이템은 무엇인가?
+  const dragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    const targetItem = e.target as HTMLDivElement;
     setDragItem(targetItem);
   };
-  const dropNow = (e: any) => {
-    const targetItem = e.target;
-    console.log(dragItem, dropItem);
 
-    //현재 놓아질 자리의 인덱스 찾기
-    const filterIndex = arr.findIndex((item, index) => {
-      if (dropItem?.innerText === item) {
-        console.log(dropItem.innerText);
-        return true;
-      }
-    });
-    console.log(filterIndex);
+  //drop후 데이터를 재정비한다.
+  const dropNow = () => {
+    // drop 자리의 인덱스 찾기
+    const destinationIndex = arr.findIndex(
+      (item) => destinationItem?.innerText === item
+    );
 
-    //현재 드래그하는 박스의 인덱스 찾기
-    const dragIndex = arr.findIndex((item, index) => {
-      if (dragItem?.innerText === item) {
-        console.log(dragItem.innerText);
-        return true;
-      }
-    });
-    console.log(dragIndex);
+    // drag 자리의 인덱스 찾기
+    const dragIndex = arr.findIndex((item) => dragItem?.innerText === item);
 
-    //arr 순서 바꾸기
-    let newArr = [...arr];
-    newArr.splice(dragIndex, 1);
-    newArr.splice(filterIndex, 0, arr[dragIndex]);
-    console.log(newArr);
-    setArr(newArr);
+    // arr 순서 바꾸기
+    if (
+      dragIndex !== -1 &&
+      destinationIndex !== -1 &&
+      //drag하는 인덱스와 destination 인덱스가 같으면 굳이 실행할 필요가 없다.
+      dragIndex !== destinationIndex
+    ) {
+      let newArr = [...arr];
+      //drag 하는 item을 꺼내고, newArr에서 해당 item을 삭제함
+      const [draggedItem] = newArr.splice(dragIndex, 1);
+
+      //꺼낸 아이템을 적절한 위치에 넣음
+      newArr.splice(destinationIndex, 0, draggedItem);
+      setArr(newArr);
+    }
   };
 
   return (
@@ -101,13 +103,13 @@ export default function Home() {
                 draggable
                 className={`bg-red-100 box-${i + 1} h-[300px]`}
                 onDragEnter={(e) => {
-                  handleDrag(e);
+                  dragDestination(e);
                 }}
                 onDragStart={(e) => {
-                  nowDragItem(e);
+                  dragStart(e);
                 }}
                 onDragEnd={(e) => {
-                  dropNow(e);
+                  dropNow();
                 }}
               >
                 {item}
