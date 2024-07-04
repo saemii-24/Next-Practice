@@ -1,13 +1,25 @@
+"use client";
 // import Pokemon from "@/components/Pokemon";
 
 import Card from "@/components/Card";
 import Header from "@/components/Header";
 import { header } from "@/props/props";
 import React from "react";
+import { useQuery } from "@apollo/client";
+import { GET_POKEMONS } from "@/query/Pokemon";
 
 const arr = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export default function Home() {
+  const { loading, error, data, fetchMore } = useQuery(GET_POKEMONS, {
+    variables: {
+      offset: 0,
+      limit: 10,
+      languageId: 3,
+    },
+  });
+  console.log(data);
+
   return (
     <>
       <Header text={header.root} />

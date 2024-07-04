@@ -11,18 +11,6 @@ export default function Home() {
   const pokemonRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [nowSelect, setNowSelect] = useState<HTMLDivElement | null>(null);
 
-  const handleRef = (index: number) => (element: HTMLDivElement | null) => {
-    pokemonRefs.current[index] = element;
-  };
-
-  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    setNowSelect(e.currentTarget);
-  };
-
-  useEffect(() => {
-    console.log(pokemonRefs);
-  }, []);
-
   //데이터 배열
   let [arr, setArr] = useState<string[]>([
     "피카츄1",
@@ -83,19 +71,6 @@ export default function Home() {
       <Header text={header.start} />
       <main className="mt-20 flex justify-center items-center">
         <div className="container grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-8">
-          {/* {arr.map((item, i) => {
-            return (
-              <div
-                key={i}
-                draggable
-                className={`cursor-pointer ${i}`}
-                ref={handleRef(i)}
-                onClick={handleClick}
-              >
-                <Pokemon num={i + 1} />
-              </div>
-            );
-          })} */}
           {arr.map((item, i) => {
             return (
               <div
