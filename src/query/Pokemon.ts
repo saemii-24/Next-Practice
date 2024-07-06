@@ -5,7 +5,7 @@ export const GET_POKEMONS = gql`
     pokemon_v2_pokemonspeciesname(
       order_by: { pokemon_species_id: asc }
       where: { language_id: { _eq: 3 } }
-      limit: 10
+      limit: 30
       offset: 0
     ) {
       name

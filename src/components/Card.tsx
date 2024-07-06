@@ -1,7 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import { pokemonInterface } from "@/types/type";
+import { PokemonType, pokemonInterface } from "@/types/type";
+import { typeLanguage } from "@/query/Pokemon";
+import TypeButton from "./TypeButton";
 
 const Card = ({ pokemon }: { pokemon: pokemonInterface }) => {
   const [start, setStart] = useState<boolean>(false);
@@ -13,14 +15,20 @@ const Card = ({ pokemon }: { pokemon: pokemonInterface }) => {
   const image =
     pokemon_v2_pokemonspecy.pokemon_v2_pokemons[0].pokemon_v2_pokemonsprites[0]
       .pokemon_v2_pokemon.pokemon_v2_pokemonsprites[0].sprites.front_shiny;
-  // console.log(image);
-  // const types =
-  console.log(pokemon_v2_pokemonspecy);
-  //number
-  // const [number, setNumber]= useState<string>('0');
-  // const handleNumber(pokemon_species_id) => {
 
-  // }
+  const changeKoreanType = (type: keyof PokemonType) => {
+    console.log(typeLanguage[type]);
+    return typeLanguage[type];
+  };
+
+  const types =
+    pokemon_v2_pokemonspecy.pokemon_v2_pokemons[0].pokemon_v2_pokemontypes
+      .map((item: any) => {
+        return item.pokemon_v2_type.name;
+      })
+      .map((type: keyof PokemonType) => {
+        return changeKoreanType(type);
+      });
 
   return (
     <div className="p-6 shadow-[0_0_10px_0_rgba(250,204,21,0.3),0_0_10px_0_rgba(236,72,153,0.3)] rounded-lg">
@@ -37,12 +45,16 @@ const Card = ({ pokemon }: { pokemon: pokemonInterface }) => {
 
       <div className="flex w-full justify-between">
         <div>
-          <button
-            type="button"
-            className="mt-2 bg-yellow-300 px-2 py-[0.1rem] rounded-md text-xs font-bold"
-          >
-            전기
-          </button>
+          <div className="flex gap-2">
+            {types.map((type: string, i: number) => {
+              return (
+                <React.Fragment key={i}>
+                  <TypeButton type={type} />
+                </React.Fragment>
+              );
+            })}
+          </div>
+
           <div className="mt-4 text-xl font-bold">{name}</div>
         </div>
         <div className="flex items-center justify-center">

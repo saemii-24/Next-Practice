@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <>
       <Header text={header.root} />
-      <main className="mt-20 flex justify-center items-center">
+      <main className="my-20 flex justify-center items-center">
         <div className="container grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-8">
           {pokemons?.map((pokemon: any, i: number) => {
             return (
