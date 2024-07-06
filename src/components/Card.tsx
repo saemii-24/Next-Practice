@@ -9,7 +9,7 @@ const Card = () => {
   };
 
   return (
-    <div className="w-[320px] h-[150px] p-5 shadow-[0_0_10px_0_rgba(250,204,21,0.3),0_0_10px_0_rgba(236,72,153,0.3)] rounded-lg">
+    <div className="p-6 shadow-[0_0_10px_0_rgba(250,204,21,0.3),0_0_10px_0_rgba(236,72,153,0.3)] rounded-lg">
       <div className="w-full">
         <div className="flex justify-between">
           <div className="flex items-center text-xs">
