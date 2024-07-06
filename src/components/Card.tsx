@@ -1,12 +1,26 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
+import { pokemonInterface } from "@/types/type";
 
-const Card = () => {
+const Card = ({ pokemon }: { pokemon: pokemonInterface }) => {
   const [start, setStart] = useState<boolean>(false);
   const handleStarClick: React.MouseEventHandler<SVGSVGElement> = () => {
     setStart(!start);
   };
+
+  const { name, pokemon_species_id: id, pokemon_v2_pokemonspecy } = pokemon;
+  const image =
+    pokemon_v2_pokemonspecy.pokemon_v2_pokemons[0].pokemon_v2_pokemonsprites[0]
+      .pokemon_v2_pokemon.pokemon_v2_pokemonsprites[0].sprites.front_shiny;
+  // console.log(image);
+  // const types =
+  console.log(pokemon_v2_pokemonspecy);
+  //number
+  // const [number, setNumber]= useState<string>('0');
+  // const handleNumber(pokemon_species_id) => {
+
+  // }
 
   return (
     <div className="p-6 shadow-[0_0_10px_0_rgba(250,204,21,0.3),0_0_10px_0_rgba(236,72,153,0.3)] rounded-lg">
@@ -15,7 +29,7 @@ const Card = () => {
           <div className="flex items-center text-xs">
             <Ball />
             <div className="ml-2">no.</div>
-            <div>001</div>
+            <div>{String(id).padStart(4, "0")}</div>
           </div>
           <Star start={start} onClick={handleStarClick} />
         </div>
@@ -29,11 +43,11 @@ const Card = () => {
           >
             전기
           </button>
-          <div className="mt-4 text-xl font-bold">피카츄</div>
+          <div className="mt-4 text-xl font-bold">{name}</div>
         </div>
         <div className="flex items-center justify-center">
           <Image
-            src="https://i.namu.wiki/i/eeva6fYyC8T1c1s6NOmsDAKnii5HtTEI-zS2pMgIc-LL-EXjpRsGHzjFNx2uMBMmmK_HYDYhBaiUeLjPQD2nzA.webp"
+            src={image}
             width={80}
             height={80}
             alt="Picture of the author"
