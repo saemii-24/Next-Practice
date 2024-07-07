@@ -22,13 +22,15 @@ const Card = ({ pokemon }: { pokemon: pokemonInterface }) => {
   };
 
   const types =
-    pokemon_v2_pokemonspecy.pokemon_v2_pokemons[0].pokemon_v2_pokemontypes
-      .map((item: any) => {
+    pokemon_v2_pokemonspecy.pokemon_v2_pokemons[0].pokemon_v2_pokemontypes.map(
+      (item: any) => {
         return item.pokemon_v2_type.name;
-      })
-      .map((type: keyof PokemonType) => {
-        return changeKoreanType(type);
-      });
+      }
+    );
+
+  // .map((type: keyof PokemonType) => {
+  //   return changeKoreanType(type);
+  // });
 
   return (
     <div className="p-6 shadow-[0_0_10px_0_rgba(250,204,21,0.3),0_0_10px_0_rgba(236,72,153,0.3)] rounded-lg">
