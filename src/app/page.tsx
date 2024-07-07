@@ -4,19 +4,20 @@
 import Card from "@/components/Card";
 import Header from "@/components/Header";
 import { header } from "@/props/props";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_POKEMONS } from "@/query/Pokemon";
 import { pokemonInterface } from "@/types/type";
+import { useInView } from "react-intersection-observer";
 
-const arr = [1, 2, 3, 4, 5, 6, 7, 8];
-
+const limit = 10;
 export default function Home() {
+  let [offset, setOffset] = useState<number>(0);
+
   const { loading, error, data, fetchMore } = useQuery(GET_POKEMONS, {
     variables: {
-      offset: 0,
-      limit: 10,
-      languageId: 3,
+      offset,
+      limit,
     },
   });
 
@@ -27,6 +28,35 @@ export default function Home() {
       setPokemons(data.pokemon_v2_pokemonspeciesname);
     }
   }, [data]);
+
+  const [ref, inView] = useInView();
+
+  useEffect(() => {
+    if (inView) {
+      setOffset((prev) => prev + limit);
+      fetchMore({
+        variables: {
+          limit: limit,
+          offset: offset,
+        },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) {
+            return previousResult;
+          }
+          return {
+            pokemon_v2_pokemonspeciesname: [
+              ...previousResult.pokemon_v2_pokemonspeciesname,
+              ...fetchMoreResult.pokemon_v2_pokemonspeciesname,
+            ],
+          };
+        },
+      });
+    }
+    console.log(data);
+  }, [inView]);
+  if (loading) {
+    return <h1>로딩중!</h1>;
+  }
 
   return (
     <>
@@ -40,6 +70,7 @@ export default function Home() {
               </React.Fragment>
             );
           })}
+          <div ref={ref} className="w-full h-10 bg-blue-400"></div>
         </div>
       </main>
     </>
