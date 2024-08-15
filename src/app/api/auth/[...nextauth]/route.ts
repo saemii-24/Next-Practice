@@ -18,7 +18,6 @@ const handler = NextAuth({
         },
       },
       async authorize(credentials, req) {
-        // Check if credentials is not undefined
         if (!credentials) {
           return null;
         }
@@ -26,15 +25,35 @@ const handler = NextAuth({
 
         // Check if the provided id and password match the test user
         if (id === "test" && password === "test") {
-          // If they match, return a user object
           return { id: "1", name: "Test User", email: "test@example.com" };
         } else {
-          // If they don't match, return null
           return null;
         }
       },
     }),
   ],
+  // 기본 jwt 설정을 사용할 경우 커스터마이징이 필요하지 않습니다.
+  jwt: {
+    // maxAge: 60 * 60 * 24 * 30,
+    maxAge: 10,
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      // User 정보가 있을 경우 token에 추가
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    // async session({ session, token }) {
+    //   // token 정보를 session에 추가
+    //   if (token) {
+    //     // session.id = token.id;
+    //     console.log(token);
+    //   }
+    //   return session;
+    // },
+  },
 });
 
 export { handler as GET, handler as POST };

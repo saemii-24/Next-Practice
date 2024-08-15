@@ -32,8 +32,20 @@ export default function Home() {
 
   const [ref, inView] = useInView();
 
-  const { data: session } = useSession();
-  console.log(session);
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "loading") {
+      // 로딩 중일 때는 아무것도 하지 않음
+      return;
+    }
+
+    if (!session) {
+      // 세션이 없으면 만료된 것으로 간주하고 로그아웃
+      console.log("세션이 만료되었습니다.");
+      // signOut(); // 로그아웃 또는 다른 동작 수행
+    }
+  }, [session, status]);
 
   useEffect(() => {
     if (inView) {
