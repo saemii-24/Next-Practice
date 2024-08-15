@@ -4,11 +4,12 @@
 import Card from "@/components/Card";
 import Header from "@/components/Header";
 import { header } from "@/props/props";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_POKEMONS } from "@/query/Pokemon";
 import { pokemonInterface } from "@/types/type";
 import { useInView } from "react-intersection-observer";
+import { useSession } from "next-auth/react";
 
 const limit = 10;
 export default function Home() {
@@ -30,6 +31,9 @@ export default function Home() {
   }, [data]);
 
   const [ref, inView] = useInView();
+
+  const { data: session } = useSession();
+  console.log(session);
 
   useEffect(() => {
     if (inView) {
@@ -70,7 +74,7 @@ export default function Home() {
               </React.Fragment>
             );
           })}
-          <div ref={ref} className="w-full h-10 bg-blue-400"></div>
+          {/* <div ref={ref} className="w-full h-10 bg-blue-400"></div> */}
         </div>
       </main>
     </>
