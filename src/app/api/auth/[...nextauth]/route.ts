@@ -1,11 +1,13 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PrismaClient } from "@prisma/client";
+import type { Adapter } from "next-auth/adapters";
 
-const handler = NextAuth({
-  session: {
-    strategy: "jwt",
-  },
+const prisma = new PrismaClient();
 
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     CredentialsProvider({
       name: "포켓몬",
@@ -17,7 +19,7 @@ const handler = NextAuth({
           placeholder: "비밀번호 입력",
         },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         if (!credentials) {
           return null;
         }
@@ -32,10 +34,9 @@ const handler = NextAuth({
       },
     }),
   ],
-  // 기본 jwt 설정을 사용할 경우 커스터마이징이 필요하지 않습니다.
-  jwt: {
-    // maxAge: 60 * 60 * 24 * 30,
-    maxAge: 10,
+  session: {
+    strategy: "jwt",
+    maxAge: 10, // 4 hours
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -45,15 +46,12 @@ const handler = NextAuth({
       }
       return token;
     },
-    // async session({ session, token }) {
-    //   // token 정보를 session에 추가
-    //   if (token) {
-    //     // session.id = token.id;
-    //     console.log(token);
-    //   }
-    //   return session;
-    // },
+    async session({ session, token }) {
+      // token 정보를 session에 추가
+      if (token) {
+        // session.id = token.id;
+      }
+      return session;
+    },
   },
 });
-
-export { handler as GET, handler as POST };

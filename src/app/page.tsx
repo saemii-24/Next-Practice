@@ -35,6 +35,8 @@ export default function Home() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
+    console.log(status);
+    console.log(session);
     if (status === "loading") {
       // 로딩 중일 때는 아무것도 하지 않음
       return;
