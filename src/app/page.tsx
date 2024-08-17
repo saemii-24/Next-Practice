@@ -9,7 +9,7 @@ import { useQuery } from "@apollo/client";
 import { GET_POKEMONS } from "@/query/Pokemon";
 import { pokemonInterface } from "@/types/type";
 import { useInView } from "react-intersection-observer";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 const limit = 10;
 export default function Home() {
@@ -35,7 +35,6 @@ export default function Home() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    console.log(status);
     console.log(session);
     if (status === "loading") {
       // 로딩 중일 때는 아무것도 하지 않음
@@ -44,7 +43,7 @@ export default function Home() {
 
     if (!session) {
       // 세션이 없으면 만료된 것으로 간주하고 로그아웃
-      console.log("세션이 만료되었습니다.");
+      // console.log("세션이 만료되었습니다.");
       // signOut(); // 로그아웃 또는 다른 동작 수행
     }
   }, [session, status]);
@@ -79,6 +78,13 @@ export default function Home() {
   return (
     <>
       <Header text={header.root} />
+      <button
+        onClick={() => {
+          signOut();
+        }}
+      >
+        로그아웃
+      </button>
       <main className="my-20 flex justify-center items-center">
         <div className="container grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-8">
           {pokemons?.map((pokemon: any, i: number) => {

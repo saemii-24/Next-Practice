@@ -3,13 +3,14 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 interface LoginFormData {
   id: string;
   password: string;
 }
 
 export default function Login() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -22,12 +23,15 @@ export default function Login() {
       redirect: false,
       id: data.id,
       password: data.password,
-      callbackUrl: "/ ",
+      callbackUrl: "/",
     });
+
+    console.log(result);
 
     if (result?.error) {
       setMessage("로그인 실패!: " + result.error);
     } else if (result?.ok) {
+      router.push("/");
       setMessage("로그인 성공!");
     }
   };

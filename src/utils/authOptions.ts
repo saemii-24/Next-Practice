@@ -27,16 +27,15 @@ export const authOptions: NextAuthOptions = {
           where: { id: id },
         });
 
+        console.log(user);
+
         if (!user) {
           //가입되지 않은 유저는 null return
           return null;
         }
 
         // 2. 암호화된 pw와 사용자가 작성한 pw가 같은지 확인한다.
-        const isPasswordValid = await bcrypt.compare(
-          password,
-          user.hashedPassword
-        );
+        const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
           //비밀번호가 잘못된 경우 null reutrn
