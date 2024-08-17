@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
 import type { Adapter } from "next-auth/adapters";
-
+const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -20,38 +20,57 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
       },
       async authorize(credentials) {
-        if (!credentials) {
-          return null;
-        }
-        const { id, password } = credentials;
+        const { id, password } = credentials!;
 
-        // Check if the provided id and password match the test user
-        if (id === "test" && password === "test") {
-          return { id: "1", name: "Test User", email: "test@example.com" };
-        } else {
+        // 가입이 되어있는 유저인지 확인한다.
+        const user = await prisma.user.findUnique({
+          where: { id: id },
+        });
+
+        if (!user) {
+          //가입되지 않은 유저는 null return
           return null;
         }
+
+        // 2. 암호화된 pw와 사용자가 작성한 pw가 같은지 확인한다.
+        const isPasswordValid = await bcrypt.compare(
+          password,
+          user.hashedPassword
+        );
+
+        if (!isPasswordValid) {
+          //비밀번호가 잘못된 경우 null reutrn
+          return null;
+        }
+
+        // 3. 모든 검증 통과시 사용자 정보 return
+        return {
+          id: user.id,
+          name: user.name,
+        };
       },
     }),
   ],
   session: {
     strategy: "jwt",
-    maxAge: 10, // 4 hours
+    maxAge: 30 * 24 * 60,
   },
   callbacks: {
-    async jwt({ token, user }) {
-      // User 정보가 있을 경우 token에 추가
+    session: ({ session, token }) => ({
+      ...session,
+      user: {
+        ...session.user,
+        id: token.sub,
+      },
+    }),
+    jwt: async ({ user, token }) => {
       if (user) {
-        token.id = user.id;
+        token.sub = user.id;
       }
       return token;
     },
-    async session({ session, token }) {
-      // token 정보를 session에 추가
-      if (token) {
-        // session.id = token.id;
-      }
-      return session;
-    },
+  },
+  pages: {
+    signIn: "/signin",
   },
 });
