@@ -5,6 +5,7 @@ import { useState } from "react";
 interface SignupFormData {
   id: string;
   password: string;
+  role: "basic" | "master"; // 역할 필드 추가
 }
 
 export default function Signup() {
@@ -53,6 +54,28 @@ export default function Signup() {
           {...register("password", { required: "비밀번호를 작성해주세요!" })}
         />
         {errors.password && <span>{errors.password.message}</span>}
+      </div>
+      <div>
+        <label>Role:</label>
+        <div>
+          <label>
+            <input
+              type="radio"
+              value="basic"
+              {...register("role", { required: "역할을 선택해주세요!" })}
+            />
+            일반 사용자
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="master"
+              {...register("role", { required: "역할을 선택해주세요!" })}
+            />
+            관리자
+          </label>
+        </div>
+        {errors.role && <span>{errors.role.message}</span>}
       </div>
       <button type="submit">Sign Up</button>
       {message && <p>{message}</p>}

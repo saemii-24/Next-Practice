@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
 export async function POST(request: Request) {
   try {
-    const { id, password } = await request.json();
+    const { id, password, role } = await request.json();
     console.log(id, password);
     //비밀번호를 해싱한다.
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -14,6 +14,7 @@ export async function POST(request: Request) {
       data: {
         id,
         password: hashedPassword,
+        role,
       },
     });
     return NextResponse.json({ message: "success", user }, { status: 200 });

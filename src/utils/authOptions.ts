@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
         id: { label: "id", type: "text", placeholder: "아이디 입력" },
         password: {
           label: "password",
-          type: "text",
+          type: "password",
           placeholder: "비밀번호 입력",
         },
       },
@@ -24,47 +24,50 @@ export const authOptions: NextAuthOptions = {
 
         // 가입이 되어있는 유저인지 확인한다.
         const user = await prisma.user.findUnique({
-          where: { id: id },
+          where: { id },
         });
 
-        console.log(user);
-
         if (!user) {
-          //가입되지 않은 유저는 null return
+          // 가입되지 않은 유저는 null return
           return null;
         }
 
-        // 2. 암호화된 pw와 사용자가 작성한 pw가 같은지 확인한다.
+        // 암호화된 pw와 사용자가 작성한 pw가 같은지 확인한다.
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-          //비밀번호가 잘못된 경우 null reutrn
+          // 비밀번호가 잘못된 경우 null return
           return null;
         }
 
-        // 3. 모든 검증 통과시 사용자 정보 return
+        // 모든 검증 통과 시 사용자 정보 return
         return {
           id: user.id,
-          name: user.name,
+          role: user.role as "basic" | "master", // 역할을 명시적으로 설정
         };
       },
     }),
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60,
+    maxAge: 30 * 24 * 60 * 60, // maxAge를 초 단위로 설정
   },
   callbacks: {
-    session: ({ session, token }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: token.sub,
-      },
-    }),
-    jwt: async ({ user, token }) => {
+    async session({ session, token }) {
+      // JWT에서 role 및 id를 세션에 추가
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.sub,
+          role: token.role as "basic" | "master", // role을 명시적으로 설정
+        },
+      };
+    },
+    async jwt({ user, token }) {
       if (user) {
-        token.sub = user.id;
+        token.sub = user.id; // 사용자 ID를 'sub' 클레임에 저장
+        token.role = user.role; // 사용자 역할을 'role' 클레임에 저장
       }
       return token;
     },
