@@ -1,123 +1,120 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
-import { Chart, registerables } from "chart.js";
+import { ArcElement, Tooltip, Legend, ScriptableContext } from "chart.js";
+import { Chart, defaults } from "chart.js/auto";
 
-// 필요한 요소 등록
-Chart.register(...registerables);
+Chart.register(ArcElement, Tooltip, Legend);
+defaults.maintainAspectRatio = false;
+defaults.responsive = true;
 
-function getSegmentAngle(index, totalSegments, rotation) {
-  const segmentSizeOfDeg = 360 / totalSegments;
-  return rotation + index * segmentSizeOfDeg;
-}
+const DoughnutChart = () => {
+  const chartRef = useRef<Chart<"doughnut">>(null);
+  const [isRendered, setIsRendered] = useState(false);
 
-function createLinearGradient(ctx, x0, y0, x1, y1, c1, c2) {
-  const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
-  gradient.addColorStop(0, c1);
-  gradient.addColorStop(1, c2);
-  return gradient;
-}
-
-const segments = [
-  { title: "Segment 1", color1: "#06d6a0", color2: "#ef476f" },
-  { title: "Segment 2", color1: "#06d6a0", color2: "#118ab2" },
-  { title: "Segment 3", color1: "#06d6a0", color2: "#ffd166" },
-  { title: "Segment 4", color1: "#06d6a0", color2: "#ef476f" },
-  { title: "Segment 5", color1: "#ef476f", color2: "#118ab2" },
-];
-
-const initialData = [1, 2, 3, 4, 5];
-const labels = segments.map(({ title }) => title);
-
-const GradientDoughnut = () => {
-  const [data, setData] = useState(initialData);
+  // 데이터와 라벨을 컴포넌트 내에서 직접 정의
+  const chartData = {
+    labels: ["Label 1", "Label 2", "Label 3", "Label 4", "Label 5"],
+    data: [10, 20, 30, 40, 50],
+  };
 
   useEffect(() => {
-    // 데이터 변경 예시
-    setData([2, 3, 4, 5, 6]);
+    setIsRendered(true);
   }, []);
 
-  const dataChart = {
+  const data = {
+    labels: chartData.labels,
     datasets: [
       {
-        label: "My First Dataset",
-        labels,
-        data,
-        backgroundColor: (context) => {
-          const { chart, dataIndex } = context;
-          const { ctx, chartArea } = chart;
+        label: "My Dataset",
+        data: chartData.data,
+        backgroundColor: (context: ScriptableContext<"doughnut">) => {
+          const ctx = context.chart.ctx;
+          // const chart = context.chart;
+          // const { width, height } = chart;
+          const centerX = 80;
+          const centerY = 80;
 
-          if (!chartArea) {
-            return null;
-          }
+          const meta = context.chart.getDatasetMeta(0);
+          const element: any = meta.data[context.dataIndex];
 
-          const totalSegments = data.length;
-          const startAngle = getSegmentAngle(
-            dataIndex,
-            totalSegments,
-            chart.options.rotation
+          const startAngle = element.startAngle || 0;
+          const endAngle = element.endAngle || Math.PI * 2;
+
+          console.log(element + " " + startAngle + " " + endAngle);
+
+          const gradientStartX = centerX + centerX * Math.cos(startAngle);
+          const gradientStartY = centerY + centerY * Math.sin(startAngle);
+          const gradientEndX = centerX + centerX * Math.cos(endAngle);
+          const gradientEndY = centerY + centerY * Math.sin(endAngle);
+
+          const gradient = ctx.createLinearGradient(
+            gradientStartX,
+            gradientStartY,
+            gradientEndX,
+            gradientEndY
           );
 
-          // 중심점 좌표
-          const centerX = (chartArea.left + chartArea.right) / 2;
-          const centerY = (chartArea.top + chartArea.bottom) / 2;
-          const radius = (chartArea.right - chartArea.left) / 2;
+          const colors = [
+            ["rgb(24, 222, 198)", "rgba(24, 222, 198, 0.25)"],
+            ["rgb(47, 133, 250)", "rgba(47, 133, 250, 0.25)"],
+            ["rgb(255, 97, 63)", "rgba(255, 97, 63, 0.25)"],
+            ["rgb(48, 209, 255)", "rgba(48, 209, 255, 0.25)"],
+            ["rgb(97, 93, 255)", "rgba(97, 93, 255, 0.25)"],
+          ];
 
-          // 시작점과 끝점 좌표 계산
-          const startX = centerX + radius * Math.cos(toRadians(startAngle));
-          const startY = centerY + radius * Math.sin(toRadians(startAngle));
-          const endX =
-            centerX +
-            radius * Math.cos(toRadians(startAngle + 360 / totalSegments));
-          const endY =
-            centerY +
-            radius * Math.sin(toRadians(startAngle + 360 / totalSegments));
+          const colorPair = colors[context.dataIndex % colors.length];
+          gradient.addColorStop(0, colorPair[0]);
+          gradient.addColorStop(1, colorPair[1]);
 
-          const { color1, color2 } = segments[dataIndex];
-
-          return createLinearGradient(
-            ctx,
-            startX,
-            startY,
-            endX,
-            endY,
-            color1,
-            color2
-          );
+          return gradient;
         },
-        hoverOffset: 10,
+        borderColor: "#ffffff",
+        borderWidth: 4,
+        borderRadius: 4,
       },
     ],
   };
 
-  return (
-    <div>
-      <Doughnut
-        data={dataChart}
-        options={{
-          responsive: true,
-          animation: false,
-          rotation: -90, // 시작 각도 설정
-          plugins: {
-            tooltip: {
-              yAlign: "bottom",
-              displayColors: false,
-              callbacks: {
-                label: function (context) {
-                  const { dataIndex, dataset } = context;
-                  return dataset.labels[dataIndex];
-                },
-              },
-            },
+  const options = {
+    cutout: "60%",
+    animation: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        usePointStyle: true,
+        borderWidth: 0,
+        callbacks: {
+          label: function (context: any) {
+            const label = context.label || "";
+            const value = context.raw || 0;
+            return `${label}: ${value}건`;
           },
-        }}
-      />
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="flex w-full items-center gap-[52px] rounded-2xl px-12 py-8">
+      <div className="size-40">
+        <Doughnut ref={chartRef} data={data} options={options} />
+      </div>
+      <ul className="block w-full ">
+        {chartData.data.map((item: any, index: number) => (
+          <li key={item} className="flex w-full items-center font-medium">
+            <div className="flex items-center text-center text-sm font-regular text-black">
+              <div className="mr-5 size-[10px] rounded-sm"></div>
+              <div>{chartData.labels[index]}</div>
+            </div>
+            <div className="ml-4">{chartData.data[index]}건</div>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
 
-export default GradientDoughnut;
-
-function toRadians(degrees) {
-  return degrees * (Math.PI / 180);
-}
+export default DoughnutChart;
