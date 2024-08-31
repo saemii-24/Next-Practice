@@ -12,15 +12,10 @@ const DoughnutChart = () => {
   const chartRef = useRef<Chart<"doughnut">>(null);
   const [isRendered, setIsRendered] = useState(false);
 
-  // 데이터와 라벨을 컴포넌트 내에서 직접 정의
   const chartData = {
     labels: ["Label 1", "Label 2", "Label 3", "Label 4", "Label 5"],
     data: [10, 20, 30, 40, 50],
   };
-
-  useEffect(() => {
-    setIsRendered(true);
-  }, []);
 
   const data = {
     labels: chartData.labels,
@@ -30,8 +25,6 @@ const DoughnutChart = () => {
         data: chartData.data,
         backgroundColor: (context: ScriptableContext<"doughnut">) => {
           const ctx = context.chart.ctx;
-          // const chart = context.chart;
-          // const { width, height } = chart;
           const centerX = 80;
           const centerY = 80;
 
@@ -40,8 +33,6 @@ const DoughnutChart = () => {
 
           const startAngle = element.startAngle || 0;
           const endAngle = element.endAngle || Math.PI * 2;
-
-          console.log(element + " " + startAngle + " " + endAngle);
 
           const gradientStartX = centerX + centerX * Math.cos(startAngle);
           const gradientStartY = centerY + centerY * Math.sin(startAngle);
@@ -97,12 +88,42 @@ const DoughnutChart = () => {
     },
   };
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const canvas = document.querySelector("canvas");
+
+      if (canvas) {
+        const inlineHeight = canvas.getAttribute("height");
+        if (inlineHeight === "200") {
+          console.log("렌더링 완료");
+          clearInterval(intervalId); // Clear interval once rendering is complete
+          setIsRendered(true); // Update state to show the chart and hide the skeleton
+        } else {
+          console.log("렌더링 x");
+        }
+      }
+    }, 100); // Check every 100ms
+
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, []);
+
   return (
-    <div className="flex w-full items-center gap-[52px] rounded-2xl px-12 py-8">
-      <div className="size-40">
+    <div className="relative flex w-full items-center gap-[52px] rounded-2xl px-12 py-8">
+      <div
+        className={`absolute top-0 left-0  ${
+          isRendered ? "opacity-0 size-0 -z-10" : "opacity-100 z-10"
+        }`}
+      >
+        Loading...
+      </div>
+      <div
+        className={`absolute top-0 left-0 size-40 ${
+          isRendered ? "opacity-100 z-10" : "opacity-0 -z-10"
+        }`}
+      >
         <Doughnut ref={chartRef} data={data} options={options} />
       </div>
-      <ul className="block w-full ">
+      <ul className="block w-full ml-40">
         {chartData.data.map((item: any, index: number) => (
           <li key={item} className="flex w-full items-center font-medium">
             <div className="flex items-center text-center text-sm font-regular text-black">
