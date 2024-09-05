@@ -107,6 +107,8 @@ const DoughnutChart = () => {
     return () => clearInterval(intervalId); // Cleanup interval on unmount
   }, []);
 
+  //chart js는 사이즈가 존재하고, 이것이 브라우저에 그대로 렌더링 되어야만 적절한 사이즈로 렌더링 된다.
+  //즉 visibile 등으론 사용이 불가하므로, 동시에 skeleotn과 차트를 렌더링 하고 z-index로 조정해 사용자에게 보여지는 값을 조정해준다.  
   return (
     <div className="relative flex w-full items-center gap-[52px] rounded-2xl px-12 py-8">
       <div
