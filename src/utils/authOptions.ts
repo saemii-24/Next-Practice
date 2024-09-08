@@ -7,6 +7,26 @@ import * as jwt from "jsonwebtoken";
 const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
 
+interface Session {
+  user: {
+    id: string;
+    role: "basic" | "master";
+  };
+  accessToken: string;
+}
+
+interface JWT {
+  accessToken: string;
+  role: "basic" | "master";
+  sub?: string; // 사용자 ID
+}
+
+interface User {
+  id: string;
+  role: "basic" | "master";
+  accessToken: string;
+}
+
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -20,7 +40,12 @@ export const authOptions = {
           placeholder: "비밀번호 입력",
         },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        // credentials가 없는 경우 null 반환
+        if (!credentials || !credentials.id || !credentials.password) {
+          return null;
+        }
+
         const { id, password } = credentials;
 
         const user = await prisma.user.findUnique({ where: { id } });
@@ -34,15 +59,16 @@ export const authOptions = {
         // JWT 토큰 생성
         const accessToken = jwt.sign(
           { id: user.id, role: user.role },
-          process.env.JWT_SECRET,
-          { expiresIn: "1h" } // 1시간 만료
+          process.env.JWT_SECRET!,
+          { expiresIn: "1h" }
         );
 
+        // 반환하는 값이 User 타입에 맞게 구성됨
         return {
           id: user.id,
-          role: user.role,
-          accessToken, // 생성한 access token 반환
-        };
+          role: user.role as "basic" | "master", // User 인터페이스에 맞게 role 타입 명시
+          accessToken,
+        } as User;
       },
     }),
   ],
@@ -51,40 +77,24 @@ export const authOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30일
   },
   callbacks: {
-    async jwt({ user, token }) {
+    async jwt({ user, token }: { user?: User; token: JWT }) {
       if (user) {
-        // 로그인 시 JWT 토큰을 클레임으로 저장
         token.accessToken = user.accessToken;
         token.role = user.role;
       }
-
-      // 토큰 검증 및 갱신
-      if (token.accessToken) {
-        try {
-          const decoded = jwt.verify(
-            token.accessToken,
-            process.env.NEXTAUTH_SECRET || "BASIC"
-          );
-          token.user = decoded; // 디코딩된 사용자 정보 저장
-        } catch (error) {
-          console.error("Error verifying token:", error);
-          return null; // 토큰 검증 실패 시 null 반환
-        }
-      }
-
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       session.user = {
-        id: token.sub,
+        id: token.sub as string,
         role: token.role,
       };
-      session.accessToken = token.accessToken; // 세션에 access token 추가
+      session.accessToken = token.accessToken;
       return session;
     },
   },
   pages: {
     signIn: "/signin",
   },
-  secret: process.env.NEXTAUTH_SECRET, // JWT 서명에 사용되는 비밀 키
+  secret: process.env.NEXTAUTH_SECRET!,
 };
